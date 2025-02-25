@@ -95,6 +95,8 @@ class Qwen2VLDataCollator(BaseDataCollator):
                     vision_grid_thw = inputs[grid_key]
                 else:
                     prompt_input_ids = self.processor.tokenizer(user_input, add_special_tokens=False, padding=False, return_tensors='pt')['input_ids']
+                    pixel_values = None
+                    vision_grid_thw = None
 
                 response_input_ids = self.processor.tokenizer(gpt_response, add_special_tokens=False, padding=False, return_tensors='pt')['input_ids']
 
@@ -111,8 +113,10 @@ class Qwen2VLDataCollator(BaseDataCollator):
                     labels = cur_input_ids.clone()
                 cur_input_ids.append(input_ids)
                 cur_labels.append(labels)
-                cur_pixel_values.append(pixel_values)
-                cur_vision_grid_thw.append(vision_grid_thw)
+                if pixel_values is not None:
+                    cur_pixel_values.append(pixel_values)
+                if vision_grid_thw is not None:
+                    cur_vision_grid_thw.append(vision_grid_thw)
             
             cur_input_ids = torch.cat(cur_input_ids, dim=0).to(torch.long)
             cur_labels = torch.cat(cur_labels, dim=0).to(torch.long)
