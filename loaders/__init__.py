@@ -18,3 +18,4 @@ from .qwen_vl import QwenVLModelLoader
 from .phi3_v import Phi3VModelLoader
 from .qwen2_vl import Qwen2VLModelLoader
 from .llama_3_2_vision import LLaMA32VisionModelLoader
+from .internvl_2 import InternVL2ModelLoader

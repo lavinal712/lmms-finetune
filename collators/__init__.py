@@ -18,3 +18,4 @@ from .qwen_vl import QwenVLDataCollator
 from .phi3_v import Phi3VDataCollator
 from .qwen2_vl import Qwen2VLDataCollator
 from .llama_3_2_vision import LLaMA32VisionDataCollator
+from .internvl_2 import InternVL2DataCollator
