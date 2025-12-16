@@ -35,7 +35,7 @@ class Phi3VDataCollator(BaseDataCollator):
         for system_prompt, cur_convs, cur_images in zip(system_prompts, conversations, images):
             cur_input_ids = []
             cur_labels = []
-            
+
             system = ''
             if system_prompt is not None:
                 system_message = {
@@ -54,7 +54,7 @@ class Phi3VDataCollator(BaseDataCollator):
                     new_image_tokens = "".join([f"<|image_{image_id + 1}|>" for image_id in range(cur_image_tokens, cur_image_tokens + num_image_tokens)])
                     if new_image_tokens:
                         new_image_tokens += "\n"
-                    
+
                     total_image_tokens += num_image_tokens
                     text = new_image_tokens + text.replace("<image>", "")
 
@@ -67,7 +67,7 @@ class Phi3VDataCollator(BaseDataCollator):
                     )
                     if i == 0:
                         prompt = system + prompt
-                    
+
                     temp = self.processor(
                         prompt, 
                         cur_images[cur_image_tokens:cur_image_tokens + num_image_tokens] \
@@ -108,7 +108,7 @@ class Phi3VDataCollator(BaseDataCollator):
 
             input_ids.append(cur_input_ids[:])
             labels.append(cur_labels[:])
-        
+
         # sanity check
         assert total_image_tokens == len(images), "Number of image tokens does not match the number of images"
 

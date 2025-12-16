@@ -150,7 +150,7 @@ class LLaMA3_2_VisionDataCollator(BaseDataCollator):
             MllamaProcessorKwargs,
             tokenizer_init_kwargs=self.tokenizer.init_kwargs,
         )
-        
+
         vision_inputs = dict()
         images: List[List[PIL.Image.Image]] = [x for instance in instances for x in instance["images"]]
         if len(images) > 0:
@@ -161,10 +161,10 @@ class LLaMA3_2_VisionDataCollator(BaseDataCollator):
         # constants
         max_len = self.tokenizer.model_max_length
         image_token_id = self.config.image_token_index
-        
+
         input_ids = []
         labels = []
-        
+
         # some parsing
         images: List[List[PIL.Image.Image]] = [instance["images"] for instance in instances]
         system_prompts: List[Union[str, None]] = [instance["system_prompt"] for instance in instances]
@@ -181,7 +181,7 @@ class LLaMA3_2_VisionDataCollator(BaseDataCollator):
                     "role": "system",
                     "content": [{"type": "text", "text": system_prompt}]
                 })
-            
+
             for i, text in enumerate(cur_convs):
                 if i % 2 == 0:
                     num_images = len([m.start() for m in re.finditer("<image>", text)])
@@ -220,7 +220,7 @@ class LLaMA3_2_VisionDataCollator(BaseDataCollator):
 
             # a dirty hack to include eos token as part of the labels
             cur_assistant_masks[0, -1] = True
-            
+
             # manual truncation
             if cur_input_ids.shape[1] > max_len:
                 cur_input_ids = cur_input_ids[:, :max_len]
@@ -231,7 +231,7 @@ class LLaMA3_2_VisionDataCollator(BaseDataCollator):
             if self.mask_question_tokens:
                 assert cur_labels.shape == cur_assistant_masks.shape, "Label and mask shapes do not match"
                 cur_labels = torch.where(cur_assistant_masks, cur_labels, self.IGNORE_TOKEN_ID)
-            
+
             assert cur_input_ids.shape == cur_labels.shape, "Input and label shapes do not match"
 
             # padding
@@ -257,10 +257,10 @@ class LLaMA3_2_VisionDataCollator(BaseDataCollator):
 
             input_ids.append(cur_input_ids)
             labels.append(cur_labels)
-            
+
         input_ids = torch.cat(input_ids)
         labels = torch.cat(labels)
-        
+
         return dict(
             **vision_inputs,
             input_ids=input_ids,

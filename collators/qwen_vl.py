@@ -30,20 +30,20 @@ class QwenVLDataCollator(BaseDataCollator):
         nl_tokens: List = self.tokenizer("\n").input_ids
         _system: List = self.tokenizer("system").input_ids + nl_tokens
         max_len = self.tokenizer.model_max_length
-        
+
         for cur_image_paths, system_prompt, cur_convs in zip(image_paths, system_prompts, conversations):
             cur_num_images = len(cur_image_paths)
             cur_image_idx = 0
 
             cur_input_ids = []
             cur_labels = []
-            
+
             if system_prompt is not None:
                 system = [im_start] + _system + self.tokenizer(system_prompt).input_ids + [im_end] + nl_tokens
                 cur_input_ids.extend(system)
                 cur_labels.extend([im_start] + [self.IGNORE_TOKEN_ID] * (len(system) - 3) + [im_end] + nl_tokens)
             assert len(cur_input_ids) == len(cur_labels), "Input and label shapes do not match"
-            
+
             for i, text in enumerate(cur_convs):
                 # deal with the special image token format of qwen-vl
                 image_token_start_locations = [m.start() for m in re.finditer('<image>', text)]
@@ -65,7 +65,7 @@ class QwenVLDataCollator(BaseDataCollator):
                     _label = [im_start] + [self.IGNORE_TOKEN_ID] * len(self.tokenizer(role).input_ids) + \
                         _input_id[len(self.tokenizer(role).input_ids) + 1:-2] + [im_end] + nl_tokens
                 cur_labels.extend(_label)
-            
+
             assert cur_image_idx == cur_num_images, "Not all images were used"
 
             assert len(cur_input_ids) == len(cur_labels), "Input and label shapes do not match"
@@ -82,7 +82,7 @@ class QwenVLDataCollator(BaseDataCollator):
 
         input_ids = torch.tensor(input_ids, dtype=torch.long)
         labels = torch.tensor(labels, dtype=torch.long)
-        
+
         return dict(
             input_ids=input_ids,
             labels=labels,

@@ -80,7 +80,7 @@ class LLaVAOnevisionDataCollator(BaseDataCollator):
         videos = [instance["videos"] for instance in instances]
         system_prompts: List[Union[str, None]] = [instance["system_prompt"] for instance in instances]
         conversations: List[List] = [instance["conversations"] for instance in instances]
-        
+
         # constants
         max_len = self.tokenizer.model_max_length
         image_token_id = self.config.image_token_index
@@ -90,7 +90,7 @@ class LLaVAOnevisionDataCollator(BaseDataCollator):
         # construct input_ids and labels
         input_ids = []
         labels = []
-        
+
         for system_prompt, cur_images, cur_videos, cur_convs in zip(system_prompts, images, videos, conversations):
             cur_num_images = 0
             cur_num_videos = 0
@@ -103,7 +103,7 @@ class LLaVAOnevisionDataCollator(BaseDataCollator):
                     "role": "system",
                     "content": [{"type": "text", "text": system_prompt}]
                 })
-            
+
             for i, text in enumerate(cur_convs):
                 if i % 2 == 0:
                     num_images = len([m.start() for m in re.finditer("<image>", text)])
@@ -126,10 +126,10 @@ class LLaVAOnevisionDataCollator(BaseDataCollator):
                         "role": "assistant",
                         "content": [{"type": "text", "text": text}]
                     })
-                
+
             assert len(cur_images) == cur_num_images, "Not all images were used"
             assert len(cur_videos) == cur_num_videos, "Not all videos were used"
-            
+
             temp = self.tokenizer.apply_chat_template(
                 cur_text,
                 chat_template=template,
@@ -192,7 +192,7 @@ class LLaVAOnevisionDataCollator(BaseDataCollator):
             if self.mask_question_tokens:
                 assert cur_labels.shape == cur_assistant_masks.shape, "Label and mask shapes do not match"
                 cur_labels = torch.where(cur_assistant_masks, cur_labels, self.IGNORE_TOKEN_ID)
-            
+
             assert cur_input_ids.shape == cur_labels.shape, "Input and label shapes do not match"
 
             # padding

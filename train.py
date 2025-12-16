@@ -61,7 +61,7 @@ def train():
             bnb_4bit_compute_dtype=compute_dtype,
             bnb_4bit_quant_type="nf4", 
         )
-    
+
     # load model, tokenizer, processor
     rank0_print("Loading model, tokenizer, processor...")
     loader = LOADERS[model_args.model_family_id](
@@ -116,18 +116,18 @@ def train():
         elif training_args.train_vision_encoder:
             rank0_print("Vision encoder will be fully trained...")
             full_modules.extend(vision_encoder_keys)
-        
+
         if lora_args.use_lora:
             rank0_print("LoRA for LLM enabled...")
             lora_modules.extend(find_all_linear_names(named_modules, llm_keys))
         else:
             rank0_print("LLM will be fully trained...")
             full_modules.extend(llm_keys)
-        
+
         if training_args.train_vision_projector:
             rank0_print("Vision projector will be fully trained...")
             full_modules.extend(vision_projector_keys)
-        
+
         lora_config = LoraConfig(
             r=lora_args.lora_r,
             lora_alpha=lora_args.lora_alpha,
@@ -144,7 +144,7 @@ def train():
             )
             
         model = get_peft_model(model, lora_config)
-        
+
     # print trainable parameters for inspection
     rank0_print("Trainable parameters:")
     for name, param in model.named_parameters():
@@ -196,7 +196,7 @@ def train():
     trainer.save_state()
 
     safe_save_model_for_hf_trainer(trainer=trainer, output_dir=output_dir)
-    
+
 
 if __name__ == "__main__":
     train()

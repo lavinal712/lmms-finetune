@@ -51,9 +51,6 @@ class GLM4VDataCollator(BaseDataCollator):
                     cur_num_images += num_images
                     assert num_images <= 1, "GLM-4V currently only supports single-image input"
 
-                    # .strip(): whitespaces and newlines are handled by chat_template
-                    # text = text.replace("<image>", "").strip()
-
                     cur_text.append({
                         "role": "user",
                         "image": cur_images[cur_num_images - 1] if num_images == 1 else empty_image,

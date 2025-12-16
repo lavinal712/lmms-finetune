@@ -22,7 +22,7 @@ class Qwen2VLDataCollator(BaseDataCollator):
             is_video = False
         elif "videos" in instances[0]:
             is_video = True
-            
+
         if not is_video:
             grid_key = "image_grid_thw"
             pixel_key = "pixel_values"
@@ -45,7 +45,7 @@ class Qwen2VLDataCollator(BaseDataCollator):
         batch_labels = []
         batch_pixel_values = []
         batch_vision_grid_thw = []
-        
+
         for b_idx, (system_prompt, cur_convs) in enumerate(zip(system_prompts, conversations)):
             cur_input_ids = []
             cur_labels = []
@@ -55,7 +55,7 @@ class Qwen2VLDataCollator(BaseDataCollator):
 
             if system_prompt is None:
                 system_prompt = SYSTEM_MESSAGE
-            
+
             for i, text in enumerate(cur_convs):
                 if i % 2 == 0:
                     num_image_tokens = len([m.start() for m in re.finditer("<image>", text)])
@@ -70,20 +70,20 @@ class Qwen2VLDataCollator(BaseDataCollator):
                         "role": "assistant",
                         "content": text
                     })
-            
+
             # heavily borrowed from https://github.com/2U1/Qwen2-VL-Finetune
             system_message = f"{DEFAULT_IM_START_TOKEN}system\n{SYSTEM_MESSAGE}\n{DEFAULT_IM_END_TOKEN}\n"
             system_message_input_ids = self.processor.tokenizer(system_message, add_special_tokens=False, return_tensors='pt')['input_ids']
             system_labels = torch.full_like(system_message_input_ids, IGNORE_INDEX) 
             cur_input_ids.append(system_message_input_ids.squeeze(0))
             cur_labels.append(system_labels.squeeze(0))
-                
+
             for idx, j in enumerate(range(0, len(cur_text), 2)):
                 user_input = cur_text[j]
                 gpt_response = cur_text[j + 1]
                 user_input = f"{DEFAULT_IM_START_TOKEN}{user_input['role']}\n{user_input['content']}\n{DEFAULT_IM_END_TOKEN}\n"
                 gpt_response = f"{DEFAULT_IM_START_TOKEN}{gpt_response['role']}\n{gpt_response['content']}\n{DEFAULT_IM_END_TOKEN}\n"
-                
+
                 if idx == 0:
                     if not is_video:
                         inputs = self.processor(text=[user_input], images=images[b_idx], videos=None, padding=False, return_tensors='pt')
@@ -116,7 +116,7 @@ class Qwen2VLDataCollator(BaseDataCollator):
                     cur_pixel_values.append(pixel_values)
                 if vision_grid_thw is not None:
                     cur_vision_grid_thw.append(vision_grid_thw)
-            
+
             cur_input_ids = torch.cat(cur_input_ids, dim=0).to(torch.long)
             cur_labels = torch.cat(cur_labels, dim=0).to(torch.long)
             cur_pixel_values = torch.cat(cur_pixel_values, dim=0)
@@ -130,7 +130,7 @@ class Qwen2VLDataCollator(BaseDataCollator):
             
             cur_input_ids = cur_input_ids.unsqueeze(0)
             cur_labels = cur_labels.unsqueeze(0)
-            
+
             # padding
             if cur_input_ids.shape[1] < max_len:
                 cur_input_ids = torch.cat([
@@ -156,7 +156,7 @@ class Qwen2VLDataCollator(BaseDataCollator):
             batch_labels.append(cur_labels)
             batch_pixel_values.append(cur_pixel_values)
             batch_vision_grid_thw.append(cur_vision_grid_thw)
-            
+
         batch_input_ids = torch.cat(batch_input_ids, dim=0)
         batch_labels = torch.cat(batch_labels, dim=0)
         batch_pixel_values = torch.cat(batch_pixel_values, dim=0)
@@ -172,7 +172,7 @@ class Qwen2VLDataCollator(BaseDataCollator):
         )
         data_dict[pixel_key] = batch_pixel_values
         data_dict[grid_key] = batch_vision_grid_thw
-        
+
         return data_dict
     
 

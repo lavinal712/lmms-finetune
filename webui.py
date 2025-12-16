@@ -62,7 +62,7 @@ def launch_training(
 
     # Run the command
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
-    
+
     # Stream the output
     output = ""
     for line in process.stdout:
@@ -81,7 +81,7 @@ def launch_training(
 def create_ui():
     with gr.Blocks(css="#container {max-width: 1600px; margin: auto;}") as ui:
         gr.Markdown("# Training GUI of lmms-finetune", elem_id="title")
-        
+
         with gr.Row():
             with gr.Column(scale=1):
                 gr.Markdown("## Model")
@@ -144,7 +144,7 @@ def create_ui():
                     label="Train Vision Projector",
                     info="Whether to train the vision projector (only full finetuning is supported)"
                 )
-        
+
         with gr.Row():
             with gr.Column(scale=1):
                 gr.Markdown("## Data")
@@ -173,7 +173,7 @@ def create_ui():
                     label="Number of Frames",
                     info="Frames sampled from each video"
                 )
-                        
+
             with gr.Column(scale=1):
                 gr.Markdown("## Training")
                 run_id = gr.Textbox(
@@ -243,10 +243,10 @@ def create_ui():
             return MODEL_HF_PATH.get(selected_model, "")
 
         model_id.change(update_hf_path, inputs=[model_id], outputs=[model_hf_path])
-        
+
         def update_default_run_id(model_id, use_lora, q_lora):
             return f"{model_id}_lora-{use_lora}_qlora-{q_lora}"
-        
+
         model_id.change(update_default_run_id, inputs=[model_id, use_lora, q_lora], outputs=[run_id])
         use_lora.change(update_default_run_id, inputs=[model_id, use_lora, q_lora], outputs=[run_id])
         q_lora.change(update_default_run_id, inputs=[model_id, use_lora, q_lora], outputs=[run_id])
