@@ -18,7 +18,7 @@ class Idefics2ModelLoader(BaseModelLoader):
         else:
             model = None
 
-        processor = AutoProcessor.from_pretrained(self.model_hf_path, do_image_splitting=False)
+        processor = AutoProcessor.from_pretrained(self.model_local_path, do_image_splitting=False)
         tokenizer = processor.tokenizer
         config = AutoConfig.from_pretrained(self.model_local_path)
         return model, tokenizer, processor, config

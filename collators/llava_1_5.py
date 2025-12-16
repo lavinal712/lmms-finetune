@@ -45,7 +45,7 @@ class LLaVA1_5_DataCollator(BaseDataCollator):
 
         input_ids = []
         labels = []
-        
+
         for system_prompt, cur_images, cur_convs in zip(system_prompts, images, conversations):
             cur_num_images = 0
             cur_input_ids = []
@@ -57,7 +57,7 @@ class LLaVA1_5_DataCollator(BaseDataCollator):
                     "role": "system",
                     "content": [{"type": "text", "text": system_prompt}]
                 })
-            
+
             for i, text in enumerate(cur_convs):
                 if i % 2 == 0:
                     num_images = len([m.start() for m in re.finditer("<image>", text)])
@@ -78,7 +78,7 @@ class LLaVA1_5_DataCollator(BaseDataCollator):
                             {"type": "text", "text": text},
                         ]
                     })
-            
+
             assert len(cur_images) == cur_num_images, "Number of image tokens does not match the number of images"
 
             temp = self.tokenizer.apply_chat_template(
@@ -129,7 +129,7 @@ class LLaVA1_5_DataCollator(BaseDataCollator):
             if self.mask_question_tokens:
                 assert cur_labels.shape == cur_assistant_masks.shape, "Label and mask shapes do not match"
                 cur_labels = torch.where(cur_assistant_masks, cur_labels, self.IGNORE_TOKEN_ID)
-            
+
             assert cur_input_ids.shape == cur_labels.shape, "Input and label shapes do not match"
 
             # padding

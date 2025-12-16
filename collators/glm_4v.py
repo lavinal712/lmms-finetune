@@ -64,7 +64,7 @@ class GLM4VDataCollator(BaseDataCollator):
                         "role": "assistant",
                         "content": text,
                     })
-            
+
             assert len(cur_images) == cur_num_images, "Number of image tokens does not match the number of images"
 
             temp = self.tokenizer.apply_chat_template(
